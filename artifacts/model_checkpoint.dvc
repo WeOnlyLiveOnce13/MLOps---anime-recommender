@@ -1,0 +1,6 @@
+outs:
+- md5: e37983f81f1c4b3bdca62515c1845fc7.dir
+  size: 167770792
+  nfiles: 1
+  hash: md5
+  path: model_checkpoint
