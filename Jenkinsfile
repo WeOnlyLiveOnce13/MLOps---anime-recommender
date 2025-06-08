@@ -3,9 +3,6 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'
-        GCP_PROJECT = 'mlops-new-447207'
-        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
-        KUBECTL_AUTH_PLUGIN = "/usr/lib/google-cloud-sdk/bin"
     }
 
     stages{
@@ -15,6 +12,35 @@ pipeline {
                 script{
                     echo 'Cloning from Github...'
                     checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/WeOnlyLiveOnce13/MLOps---anime-recommender.git']])
+                }
+            }
+        }
+
+        stage("Making a virtual environment...."){
+            steps{
+                script{
+                    echo 'Building the virtual environment...'
+                    sh '''
+                    python -m venv ${VENV_DIR}
+                    . ${VENV_DIR}/bin/activate
+                    pip install --upgrade pip
+                    pip install -e .
+                    pip install  dvc
+                    '''
+                }
+            }
+        }
+
+        stage("Pulling artifacts saved by DVC from GCP bucket into venv"){
+            steps{
+                withCredentials([file(credentialsId:'gcp-bucket-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS' )]){
+                    script{
+                        echo 'DVC Pul....'
+                        sh '''
+                        . ${VENV_DIR}/bin/activate
+                        dvc pull
+                        '''
+                    }
                 }
             }
         }
