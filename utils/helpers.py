@@ -3,9 +3,9 @@ import numpy as np
 import joblib
 from config.paths_config import *
 
-############# 1. GET_ANIME_FRAME
+#------------------- 1. GET_ANIME_FRAME
 
-def getAnimeFrame(anime,path_df):
+def getAnimeFrame(anime, path_df):
     df = pd.read_csv(path_df)
     if isinstance(anime,int):
         return df[df.anime_id == anime]
@@ -13,9 +13,9 @@ def getAnimeFrame(anime,path_df):
         return df[df.eng_version == anime]
     
 
-########## 2. GET_SYNOPSIS
+#-------------------- 2. GET_SYNOPSIS
 
-def getSynopsis(anime,path_synopsis_df):
+def getSynopsis(anime, path_synopsis_df):
     synopsis_df = pd.read_csv(path_synopsis_df)
     if isinstance(anime,int):
         return synopsis_df[synopsis_df.MAL_ID == anime].sypnopsis.values[0]
@@ -23,7 +23,7 @@ def getSynopsis(anime,path_synopsis_df):
         return synopsis_df[synopsis_df.Name == anime].sypnopsis.values[0]
 
 
-########## 3. CONTENT RECOMMENDATION
+#---------------------- 3. CONTENT RECOMMENDATION
 
 def find_similar_animes(name, path_anime_weights, path_anime2anime_encoded, path_anime2anime_decoded, path_anime_df, n=10, return_dist=False, neg=False):
     # Load weights and encoded-decoded mappings
@@ -78,7 +78,7 @@ def find_similar_animes(name, path_anime_weights, path_anime2anime_encoded, path
     return Frame[Frame.anime_id != index].drop(['anime_id'], axis=1)
 
 
-######## 4. FIND_SIMILAR_USERS
+#---------------------------------- 4. FIND_SIMILAR_USERS
 
 
 def find_similar_users(item_input , path_user_weights , path_user2user_encoded , path_user2user_decoded, n=10 , return_dist=False,neg=False):
@@ -125,7 +125,7 @@ def find_similar_users(item_input , path_user_weights , path_user2user_encoded ,
         print("Error Occured",e)
 
 
-################## 5. GET USER PREF
+#--------------------------- 5. GET USER PREFERENCES
 
 def get_user_preferences(user_id , path_rating_df , path_anime_df ):
 
@@ -151,7 +151,7 @@ def get_user_preferences(user_id , path_rating_df , path_anime_df ):
 
 
 
-######## 6. USER RECOMMENDATION
+#----------------------------- 6. USER RECOMMENDATION
 
 
 def get_user_recommendations(similar_users , user_pref ,path_anime_df , path_synopsis_df, path_rating_df, n=10):

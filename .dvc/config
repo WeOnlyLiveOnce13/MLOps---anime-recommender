@@ -1,0 +1,4 @@
+[core]
+    remote = gcp-bucket
+['remote "gcp-bucket"']
+    url = gs://mlops-recommender-dvc/
