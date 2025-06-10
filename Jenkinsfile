@@ -6,6 +6,10 @@ pipeline {
         GCP_PROJECT = 'anime-recommender-mlops'
         GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
         KUBECTL_AUTH_PLUGIN = "/usr/lib/google-cloud-sdk/bin"
+
+        COMET_API_KEY = credentials('comet-api-key')
+        COMET_PROJECT_NAME = credentials('comet-project-name') 
+        COMET_WORKSPACE = credentials('comet-workspace')
     }
 
     stages{
@@ -50,7 +54,13 @@ pipeline {
 
         stage('Build and Push Image to GCR'){
             steps{
-                withCredentials([file(credentialsId:'gcp-bucket-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS' )]){
+                withCredentials([
+                  file(credentialsId:'gcp-bucket-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS'),
+                  string(credentialsId: 'comet-api-key', variable: 'COMET_API_KEY'),
+                  string(credentialsId: 'comet-project-name', variable: 'COMET_PROJECT_NAME'),
+                  string(credentialsId: 'comet-workspace', variable: 'COMET_WORKSPACE')
+                  
+                ]){
                     script{
                         echo 'Build and Push Image to GCR'
                         sh '''
@@ -58,7 +68,12 @@ pipeline {
                         gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
                         gcloud config set project ${GCP_PROJECT}
                         gcloud auth configure-docker --quiet
-                        docker build -t gcr.io/${GCP_PROJECT}/ml-project:latest .
+                        docker build \
+                            --build-arg COMET_API_KEY=${COMET_API_KEY} \
+                            --build-arg COMET_PROJECT_NAME=${COMET_PROJECT_NAME} \
+                            --build-arg COMET_WORKSPACE=${COMET_WORKSPACE} \
+                            -t gcr.io/${GCP_PROJECT}/ml-project:latest .
+
                         docker push gcr.io/${GCP_PROJECT}/ml-project:latest
                         '''
                     }
@@ -68,7 +83,14 @@ pipeline {
 
         stage('Deploying to Kubernetes'){
             steps{
-                withCredentials([file(credentialsId:'gcp-bucket-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS' )]){
+                withCredentials([
+                    
+                    file(credentialsId:'gcp-bucket-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS'),
+                    string(credentialsId: 'comet-api-key', variable: 'COMET_API_KEY'),
+                    string(credentialsId: 'comet-project-name', variable: 'COMET_PROJECT_NAME'),
+                    string(credentialsId: 'comet-workspace', variable: 'COMET_WORKSPACE')
+                    
+                ]){
                     script{
                         echo 'Deploying to Kubernetes'
                         sh '''
@@ -76,6 +98,13 @@ pipeline {
                         gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
                         gcloud config set project ${GCP_PROJECT}
                         gcloud container clusters get-credentials ml-app-cluster --region africa-south1
+
+                        kubectl set env deployment/ml-app-deployment \
+                            COMET_API_KEY=${COMET_API_KEY} \
+                            COMET_PROJECT_NAME=${COMET_PROJECT_NAME} \
+                            COMET_WORKSPACE=${COMET_WORKSPACE}
+                            
+                        envsubst < deployment.yaml | kubectl apply -f -   
                         kubectl apply -f deployment.yaml
                         '''
                     }
