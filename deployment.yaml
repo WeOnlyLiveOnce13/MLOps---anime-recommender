@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ml-app
+  name: ml-app-deployment
 spec:
   replicas: 2
   selector:
@@ -17,6 +17,13 @@ spec:
         image: gcr.io/anime-recommender-mlops/ml-project:latest
         ports:
         - containerPort: 5000  # Replace with the port your app listens on
+        env:
+        - name: COMET_API_KEY
+          value: "placeholder"  # Will be updated by kubectl set env in pipeline
+        - name: COMET_PROJECT_NAME
+          value: "placeholder"  
+        - name: COMET_WORKSPACE
+          value: "placeholder"
 ---
 apiVersion: v1
 kind: Service
