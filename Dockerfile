@@ -24,6 +24,16 @@ COPY . .
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -e .
 
+ARG COMET_API_KEY
+ARG COMET_PROJECT_NAME
+ARG COMET_WORKSPACE
+
+# Set them as environment variables
+ENV COMET_API_KEY=$COMET_API_KEY
+ENV COMET_PROJECT_NAME=$COMET_PROJECT_NAME
+ENV COMET_WORKSPACE=$COMET_WORKSPACE
+
+
 # Train the model before running the application
 RUN python pipeline/training_pipeline.py
 

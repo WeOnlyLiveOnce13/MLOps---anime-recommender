@@ -2,6 +2,7 @@ import joblib
 import comet_ml
 import numpy as np
 import os
+import sys
 from dotenv import load_dotenv
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler, TensorBoard, EarlyStopping
@@ -21,11 +22,11 @@ class ModelTraining:
 
         comet_api_key = os.getenv('COMET_API_KEY')
         comet_project = os.getenv('COMET_PROJECT_NAME', 'anime-recommender-mlops')
-        comet_workspace = os.getenv('COMET_WORKSPACE', 'data-guru0')
+        comet_workspace = os.getenv('COMET_WORKSPACE', 'dan-tshisungu')
 
         if not comet_api_key:
             logger.error("COMET_API_KEY not found in environment variables")
-            raise CustomException("COMET_API_KEY environment variable is required")
+            raise CustomException("COMET_API_KEY environment variable is required", sys.exc_info())
 
         self.experiment = comet_ml.Experiment(
             api_key=comet_api_key,
