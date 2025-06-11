@@ -1,14 +1,15 @@
 import traceback
 import sys
+from typing import Optional
 
 class CustomException(Exception):
 
-    def __init__(self, error_message, error_detail:sys):
+    def __init__(self, error_message: str, error_detail: Optional[Exception] = None):
         super().__init__(error_message)
         self.error_message = self.get_detailed_error_message(error_message,error_detail)
 
     @staticmethod
-    def get_detailed_error_message(error_message , error_detail:sys):
+    def get_detailed_error_message(error_message: str, error_detail: Optional[Exception] = None):
 
         _, _, exc_tb = traceback.sys.exc_info()
         file_name = exc_tb.tb_frame.f_code.co_filename
