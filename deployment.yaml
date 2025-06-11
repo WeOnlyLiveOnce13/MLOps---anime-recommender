@@ -19,11 +19,11 @@ spec:
         - containerPort: 5000  # Replace with the port your app listens on
         env:
         - name: COMET_API_KEY
-          value: "placeholder"  # Will be updated by kubectl set env in pipeline
+          value: "${COMET_API_KEY}"
         - name: COMET_PROJECT_NAME
-          value: "placeholder"  
+          value: "${COMET_PROJECT_NAME}"
         - name: COMET_WORKSPACE
-          value: "placeholder"
+          value: "${COMET_WORKSPACE}"
 ---
 apiVersion: v1
 kind: Service
