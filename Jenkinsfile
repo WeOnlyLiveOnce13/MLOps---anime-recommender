@@ -99,13 +99,14 @@ pipeline {
                         gcloud config set project ${GCP_PROJECT}
                         gcloud container clusters get-credentials ml-app-cluster --region africa-south1
 
+                        kubectl apply -f deployment.yaml
+                        
+                        kubectl rollout status deployment/ml-app-deployment --timeout=300s
+
                         kubectl set env deployment/ml-app-deployment \
                             COMET_API_KEY=${COMET_API_KEY} \
                             COMET_PROJECT_NAME=${COMET_PROJECT_NAME} \
                             COMET_WORKSPACE=${COMET_WORKSPACE}
-                            
-                        envsubst < deployment.yaml | kubectl apply -f -   
-                        kubectl apply -f deployment.yaml
                         '''
                     }
                 }
